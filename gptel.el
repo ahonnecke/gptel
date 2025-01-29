@@ -456,7 +456,7 @@ To set the target token count for a chat session interactively
 call `gptel-send' with a prefix argument."
   :safe #'always
   :type '(choice (natnum :tag "Specify Token count")
-                 (const :tag "Default" nil)))
+          (const :tag "Default" nil)))
 
 (defcustom gptel-model 'gpt-4o-mini
   "GPT Model for chat.
@@ -789,7 +789,7 @@ and \"apikey\" as USER."
                    :host (or host (gptel-backend-host gptel-backend))
                    :user (or user "apikey")
                    :require '(:secret)))
-                              :secret)))
+             :secret)))
       (if (functionp secret)
           (encode-coding-string (funcall secret) 'utf-8)
         secret)
@@ -897,10 +897,10 @@ Note: This will move the cursor."
 (defsubst gptel--trim-prefixes (s)
   "Remove prompt/response prefixes from string S."
   (string-trim s
-   (format "[\t\r\n ]*\\(?:%s\\)?[\t\r\n ]*"
-             (regexp-quote (gptel-prompt-prefix-string)))
-   (format "[\t\r\n ]*\\(?:%s\\)?[\t\r\n ]*"
-           (regexp-quote (gptel-response-prefix-string)))))
+               (format "[\t\r\n ]*\\(?:%s\\)?[\t\r\n ]*"
+                       (regexp-quote (gptel-prompt-prefix-string)))
+               (format "[\t\r\n ]*\\(?:%s\\)?[\t\r\n ]*"
+                       (regexp-quote (gptel-response-prefix-string)))))
 
 (defsubst gptel--link-standalone-p (beg end)
   "Return non-nil if positions BEG and END are isolated.
@@ -948,7 +948,7 @@ in any way.")
 (defsubst gptel--model-mime-capable-p (mime &optional model)
   "Return non nil if MODEL can understand MIME type."
   (car-safe (member mime (gptel--model-mimes
-                        (or model gptel-model)))))
+                          (or model gptel-model)))))
 
 (defsubst gptel--model-request-params (model)
   "Get model-specific request parameters for MODEL."
@@ -990,7 +990,7 @@ FILE is assumed to exist and be a regular file."
         (when (setq prop (text-property-search-forward
                           'gptel 'response t))
           (cons (prop-match-beginning prop)
-                      (prop-match-end prop)))))))
+                (prop-match-end prop)))))))
 
 (defun gptel--in-response-p (&optional pt)
   "Check if position PT is inside a gptel response."
@@ -1157,7 +1157,7 @@ file."
           (unless (equal (default-value 'gptel-temperature) gptel-temperature)
             (add-file-local-variable 'gptel-temperature gptel-temperature))
           (unless (equal (default-value 'gptel--system-message)
-                           gptel--system-message)
+                         gptel--system-message)
             (add-file-local-variable
              'gptel--system-message
              (car-safe (gptel--parse-directive gptel--system-message))))
@@ -1190,93 +1190,93 @@ file."
         (add-hook 'before-save-hook #'gptel--save-state nil t)
         (gptel--restore-state)
         (if gptel-use-header-line
-          (setq gptel--old-header-line header-line-format
-                header-line-format
-                (list '(:eval (concat (propertize " " 'display '(space :align-to 0))
-                               (format "%s" (gptel-backend-name gptel-backend))))
-                      (propertize " Ready" 'face 'success)
-                      '(:eval
-                        (let* ((model (gptel--model-name gptel-model))
-                              (system
-                               (propertize
-                                (buttonize
-                                 (format "[Prompt: %s]"
-                                  (or (car-safe (rassoc gptel--system-message gptel-directives))
-                                   (gptel--describe-directive gptel--system-message 15)))
-                                 (lambda (&rest _) (gptel-system-prompt)))
-                                'mouse-face 'highlight
-                                'help-echo "System message for session"))
-                              (context
-                               (and gptel-context--alist
-                                (cl-loop for entry in gptel-context--alist
-                                 if (bufferp (car entry)) count it into bufs
-                                 else count (stringp (car entry)) into files
-                                 finally return
-                                 (propertize
-                                  (buttonize
-                                   (concat "[Context: "
-                                    (and (> bufs 0) (format "%d buf" bufs))
-                                    (and (> bufs 1) "s")
-                                    (and (> bufs 0) (> files 0) ", ")
-                                    (and (> files 0) (format "%d file" files))
-                                    (and (> files 1) "s")
-                                    "]")
-                                   (lambda (&rest _)
-                                     (require 'gptel-context)
-                                     (gptel-context--buffer-setup)))
-                                  'mouse-face 'highlight
-                                  'help-echo "Active gptel context"))))
-                              (toggle-track-media
-                               (lambda (&rest _)
-                                 (setq-local gptel-track-media
-                                  (not gptel-track-media))
-                                 (if gptel-track-media
-                                     (message
-                                      (concat
-                                       "Sending media from included links.  To include media, create "
-                                       "a \"standalone\" link in a paragraph by itself, separated from surrounding text."))
-                                   (message "Ignoring image links.  Only link text will be sent."))
-                                 (run-at-time 0 nil #'force-mode-line-update)))
-                              (track-media
-                               (and (gptel--model-capable-p 'media)
-                                (if gptel-track-media
-                                    (propertize
-                                     (buttonize "[Sending media]" toggle-track-media)
-                                     'mouse-face 'highlight
-                                     'help-echo
-                                     "Sending media from standalone links/urls when supported.\nClick to toggle")
+            (setq gptel--old-header-line header-line-format
+                  header-line-format
+                  (list '(:eval (concat (propertize " " 'display '(space :align-to 0))
+                                        (format "%s" (gptel-backend-name gptel-backend))))
+                        (propertize " Ready" 'face 'success)
+                        '(:eval
+                          (let* ((model (gptel--model-name gptel-model))
+                                 (system
                                   (propertize
-                                   (buttonize "[Ignoring media]" toggle-track-media)
+                                   (buttonize
+                                    (format "[Prompt: %s]"
+                                            (or (car-safe (rassoc gptel--system-message gptel-directives))
+                                                (gptel--describe-directive gptel--system-message 15)))
+                                    (lambda (&rest _) (gptel-system-prompt)))
                                    'mouse-face 'highlight
-                                   'help-echo
-                                   "Ignoring images from standalone links/urls.\nClick to toggle"))))
-                              (toggle-tools (lambda (&rest _) (interactive)
-                                              (run-at-time 0 nil
-                                               (lambda () (call-interactively #'gptel-tools)))))
-                              (tools (when (and gptel-use-tools gptel-tools)
-                                      (propertize
-                                       (buttonize (pcase (length gptel-tools)
-                                                   (0 "[No tools]") (1 "[1 tool]")
-                                                   (len (format "[%d tools]" len)))
-                                        toggle-tools)
-                                       'mouse-face 'highlight
-                                       'help-echo "Select tools"))))
-                         (concat
-                          (propertize
-                           " " 'display
-                           `(space :align-to (- right
-                                              ,(+ 5 (length model) (length system)
-                                                (length track-media) (length context) (length tools)))))
-                          tools (and track-media " ") track-media (and context " ") context " " system " "
-                          (propertize
-                           (buttonize (concat "[" model "]")
-                            (lambda (&rest _) (gptel-menu)))
-                           'mouse-face 'highlight
-                           'help-echo "GPT model in use"))))))
+                                   'help-echo "System message for session"))
+                                 (context
+                                  (and gptel-context--alist
+                                       (cl-loop for entry in gptel-context--alist
+                                                if (bufferp (car entry)) count it into bufs
+                                                else count (stringp (car entry)) into files
+                                                finally return
+                                                (propertize
+                                                 (buttonize
+                                                  (concat "[Context: "
+                                                          (and (> bufs 0) (format "%d buf" bufs))
+                                                          (and (> bufs 1) "s")
+                                                          (and (> bufs 0) (> files 0) ", ")
+                                                          (and (> files 0) (format "%d file" files))
+                                                          (and (> files 1) "s")
+                                                          "]")
+                                                  (lambda (&rest _)
+                                                    (require 'gptel-context)
+                                                    (gptel-context--buffer-setup)))
+                                                 'mouse-face 'highlight
+                                                 'help-echo "Active gptel context"))))
+                                 (toggle-track-media
+                                  (lambda (&rest _)
+                                    (setq-local gptel-track-media
+                                                (not gptel-track-media))
+                                    (if gptel-track-media
+                                        (message
+                                         (concat
+                                          "Sending media from included links.  To include media, create "
+                                          "a \"standalone\" link in a paragraph by itself, separated from surrounding text."))
+                                      (message "Ignoring image links.  Only link text will be sent."))
+                                    (run-at-time 0 nil #'force-mode-line-update)))
+                                 (track-media
+                                  (and (gptel--model-capable-p 'media)
+                                       (if gptel-track-media
+                                           (propertize
+                                            (buttonize "[Sending media]" toggle-track-media)
+                                            'mouse-face 'highlight
+                                            'help-echo
+                                            "Sending media from standalone links/urls when supported.\nClick to toggle")
+                                         (propertize
+                                          (buttonize "[Ignoring media]" toggle-track-media)
+                                          'mouse-face 'highlight
+                                          'help-echo
+                                          "Ignoring images from standalone links/urls.\nClick to toggle"))))
+                                 (toggle-tools (lambda (&rest _) (interactive)
+                                                 (run-at-time 0 nil
+                                                              (lambda () (call-interactively #'gptel-tools)))))
+                                 (tools (when (and gptel-use-tools gptel-tools)
+                                          (propertize
+                                           (buttonize (pcase (length gptel-tools)
+                                                        (0 "[No tools]") (1 "[1 tool]")
+                                                        (len (format "[%d tools]" len)))
+                                                      toggle-tools)
+                                           'mouse-face 'highlight
+                                           'help-echo "Select tools"))))
+                            (concat
+                             (propertize
+                              " " 'display
+                              `(space :align-to (- right
+                                                   ,(+ 5 (length model) (length system)
+                                                       (length track-media) (length context) (length tools)))))
+                             tools (and track-media " ") track-media (and context " ") context " " system " "
+                             (propertize
+                              (buttonize (concat "[" model "]")
+                                         (lambda (&rest _) (gptel-menu)))
+                              'mouse-face 'highlight
+                              'help-echo "GPT model in use"))))))
           (setq mode-line-process
                 '(:eval (concat " "
-                         (buttonize (gptel--model-name gptel-model)
-                            (lambda (&rest _) (gptel-menu))))))))
+                                (buttonize (gptel--model-name gptel-model)
+                                           (lambda (&rest _) (gptel-menu))))))))
     (remove-hook 'before-save-hook #'gptel--save-state t)
     (if gptel-use-header-line
         (setq header-line-format gptel--old-header-line
@@ -1298,8 +1298,8 @@ file."
           (setq mode-line-process (propertize msg 'face face))
         (setq mode-line-process
               '(:eval (concat " "
-                       (buttonize (gptel--model-name gptel-model)
-                            (lambda (&rest _) (gptel-menu))))))
+                              (buttonize (gptel--model-name gptel-model)
+                                         (lambda (&rest _) (gptel-menu))))))
         (message (propertize msg 'face face))))
     (force-mode-line-update)))
 
@@ -1543,7 +1543,7 @@ implementation, used by OpenAI-compatible APIs and Ollama."
                              ,@(cond
                                 ((equal type "object")
                                  (list :parameters (plist-get arg :parameters)
-                                  :additionalProperties :json-false))
+                                       :additionalProperties :json-false))
                                 ((equal type "array")
                                  ;; TODO(tool) If the item type is an object,
                                  ;; add :additionalProperties to it
@@ -1552,7 +1552,7 @@ implementation, used by OpenAI-compatible APIs and Ollama."
                     (vconcat
                      (delq nil (mapcar
                                 (lambda (arg) (and (not (plist-get arg :optional))
-                                              (plist-get arg :name)))
+                                                   (plist-get arg :name)))
                                 (gptel-tool-args tool))))
                     :additionalProperties :json-false))))))
     (ensure-list tools))))
@@ -1565,7 +1565,7 @@ send to the LLM.")
 
 ;; FIXME(fsm) unify this with `gptel--wrap-user-prompt', which is a mess
 (cl-defgeneric gptel--inject-prompt
-  (_backend data new-prompt &optional _position)
+    (_backend data new-prompt &optional _position)
   "Append NEW-PROMPT to existing prompts in query DATA.
 
 NEW-PROMPT can be a single message or a list of messages.
@@ -1690,16 +1690,16 @@ MACHINE is an instance of `gptel-fsm'"
   "State machine for latest request in the buffer.")
 
 (defun gptel--fsm-last (fsm)
-    "Capture the latest request state FSM for introspection."
-    (let ((info (gptel-fsm-info fsm)))
-      (unless gptel-log-level
-        (let ((data (plist-get info :data)))
-          (dolist (key '(:messages :contents :query))
-            (setf (plist-get data key) nil))))
-      (setf (gptel-fsm-info fsm)
-            (plist-put info :end-time (current-time-string)))
-      (with-current-buffer (plist-get info :buffer)
-        (setq gptel--fsm-last fsm))))
+  "Capture the latest request state FSM for introspection."
+  (let ((info (gptel-fsm-info fsm)))
+    (unless gptel-log-level
+      (let ((data (plist-get info :data)))
+        (dolist (key '(:messages :contents :query))
+          (setf (plist-get data key) nil))))
+    (setf (gptel-fsm-info fsm)
+          (plist-put info :end-time (current-time-string)))
+    (with-current-buffer (plist-get info :buffer)
+      (setq gptel--fsm-last fsm))))
 
 (defun gptel--inspect-fsm (&optional fsm)
   "Inspect gptel request state FSM.
@@ -1723,11 +1723,11 @@ buffer."
     (let* ((pb (lambda (s) (propertize s 'face 'font-lock-builtin-face)))
            (ps (lambda (s) (propertize s 'face 'font-lock-string-face)))
            (fmt (lambda (s) (cond ((memq (car-safe s) '(closure lambda))
-                              (format "#<lambda %#x>" (sxhash s)))
-                             ((byte-code-function-p s)
-                              (format "#<compiled %#x>" (sxhash s)))
-                             ((stringp s) (string-replace "\n" "⮐ " s))
-                             (t (prin1-to-string s)))))
+                                   (format "#<lambda %#x>" (sxhash s)))
+                                  ((byte-code-function-p s)
+                                   (format "#<compiled %#x>" (sxhash s)))
+                                  ((stringp s) (string-replace "\n" "⮐ " s))
+                                  (t (prin1-to-string s)))))
            (inhibit-read-only t)
            (info (gptel-fsm-info fsm))
            (entries-info
@@ -1750,10 +1750,10 @@ buffer."
       (setq tabulated-list-entries
             (nconc (list `(2 [,(funcall pb ":state")
                               ,(funcall ps
-                                (mapconcat
-                                 fmt (reverse (cons (gptel-fsm-state fsm)
-                                               (plist-get info :history)))
-                                 " → "))]))
+                                        (mapconcat
+                                         fmt (reverse (cons (gptel-fsm-state fsm)
+                                                            (plist-get info :history)))
+                                         " → "))]))
                    entries-info
                    entries-data))
       (tabulated-list-print)
@@ -1860,7 +1860,7 @@ Run post-response hooks."
               (gptel-buffer (plist-get info :buffer))
               (start-marker (plist-get info :position))
               (tracking-marker (or (plist-get info :tracking-marker)
-                              start-marker))
+                                   start-marker))
               (backend-name
                (gptel-backend-name
                 (buffer-local-value 'gptel-backend gptel-buffer))))
@@ -1933,7 +1933,7 @@ Run post-response hooks."
                     (gptel-tool-args tool-spec)))
              ;; Check if tool requires confirmation
              (if (and gptel-confirm-tool-calls (or (eq gptel-confirm-tool-calls t)
-                                                 (gptel-tool-confirm tool-spec)))
+                                                   (gptel-tool-confirm tool-spec)))
                  (push (list tool-spec process-tool-result arg-values)
                        pending-calls)
                ;; If not, run the tool
@@ -2180,7 +2180,7 @@ BUF defaults to the current buffer."
     (with-demoted-errors "Callback error: %S"
       (and-let* ((cb (plist-get info :callback))
                  ((functionp cb)))
-           (funcall cb 'abort info)))
+        (funcall cb 'abort info)))
     (if gptel-use-curl
         (progn                        ;Clean up Curl process
           (setf (alist-get proc gptel--request-alist nil 'remove) nil)
@@ -2360,7 +2360,7 @@ there."
                      (or (eq gptel-use-context 'user)
                          (gptel--model-capable-p 'nosystem))
                      (> (length prompts) 0)) ;FIXME context should be injected
-                                             ;even when there are no prompts
+                                        ;even when there are no prompts
             (gptel--wrap-user-prompt gptel-backend prompts))
           ;; Inject media chunks into the first user prompt if required.  Media
           ;; chunks are always included with the first user message,
@@ -2435,7 +2435,7 @@ for inclusion into the user prompt for the gptel request."
                       '("https:" "http:" "ftp:"))
             ;; Collect text up to this image, and collect this image url
             (when (gptel--model-capable-p 'url) ; FIXME This is not a good place
-                                                ; to check for url capability!
+                                        ; to check for url capability!
               (push (list :text (buffer-substring-no-properties from-pt (car link-at-pt)))
                     parts)
               (push (list :url path :mime mime) parts)
@@ -2699,18 +2699,18 @@ for tool call results.  INFO contains the state of the request."
                  (lambda (tcs) (gptel--accept-tool-calls (list tcs) nil))
                  response '("tool call" "tool calls" "run")
                  `((?i ,(lambda (_) (save-window-excursion
-                                 (with-selected-window
-                                     (gptel--inspect-fsm gptel--fsm-last)
-                                   (goto-char (point-min))
-                                   (when (search-forward-regexp "^:tool-use" nil t)
-                                    (forward-line 0) (hl-line-highlight))
-                                   (use-local-map
-                                    (make-composed-keymap
-                                     (define-keymap "q" (lambda () (interactive)
-                                                          (quit-window)
-                                                          (exit-recursive-edit)))
-                                     (current-local-map)))
-                                   (recursive-edit) nil)))
+                                      (with-selected-window
+                                          (gptel--inspect-fsm gptel--fsm-last)
+                                        (goto-char (point-min))
+                                        (when (search-forward-regexp "^:tool-use" nil t)
+                                          (forward-line 0) (hl-line-highlight))
+                                        (use-local-map
+                                         (make-composed-keymap
+                                          (define-keymap "q" (lambda () (interactive)
+                                                               (quit-window)
+                                                               (exit-recursive-edit)))
+                                          (current-local-map)))
+                                        (recursive-edit) nil)))
                     "inspect call(s)"))))
             ;; Prompt for confirmation from the chat buffer
             (let* ((backend-name (gptel-backend-name (plist-get info :backend)))
@@ -2849,7 +2849,7 @@ against if required."
                   (add-text-properties
                    b e `(gptel-history
                          ,(append (ensure-list history)
-                           (get-char-property (1- e) 'gptel-history))
+                                  (get-char-property (1- e) 'gptel-history))
                          front-sticky (gptel gptel-history))))
                 (remove-hook 'gptel-post-response-functions
                              gptel--attach-after 'local))))
@@ -2932,9 +2932,9 @@ context for the ediff session."
        history (cons (buffer-substring-no-properties beg end)
                      (nbutlast history))))
     (add-text-properties
-             0 (length alt-response)
-             `(gptel response gptel-history ,history)
-             alt-response)
+     0 (length alt-response)
+     `(gptel response gptel-history ,history)
+     alt-response)
     (setq offset (min (- (point) beg) (1- (length alt-response))))
     (delete-region beg end)
     (insert alt-response)

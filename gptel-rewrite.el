@@ -88,7 +88,7 @@ command.  Set it to the symbol `merge', `diff', `ediff' or
   "C-c C-e" #'gptel--rewrite-ediff
   "C-c C-n" #'gptel--rewrite-next
   "C-c C-p" #'gptel--rewrite-previous
-  "C-c C-m" #'gptel--rewrite-merge)
+  "C-c C-m" #'gptel--rewrite-merge )
 
 (defvar-local gptel--rewrite-overlays nil
   "List of active rewrite overlays in the buffer.")
@@ -159,9 +159,9 @@ CALLBACK is supplied by Eldoc, see
 `eldoc-documentation-functions'."
   (when (and gptel--rewrite-overlays
              (get-char-property (point) 'gptel-rewrite))
-      (funcall callback
-               (format (substitute-command-keys "%s rewrite available: accept \\[gptel--rewrite-accept], iterate \\[gptel--rewrite-iterate], clear \\[gptel--rewrite-reject], merge \\[gptel--rewrite-merge], diff \\[gptel--rewrite-diff] or ediff \\[gptel--rewrite-ediff]")
-                       (propertize (gptel--model-name gptel-model) 'face 'mode-line-emphasis)))))
+    (funcall callback
+             (format (substitute-command-keys "%s rewrite available: accept \\[gptel--rewrite-accept], iterate \\[gptel--rewrite-iterate], clear \\[gptel--rewrite-reject], merge \\[gptel--rewrite-merge], diff \\[gptel--rewrite-diff] or ediff \\[gptel--rewrite-ediff]")
+                     (propertize (gptel--model-name gptel-model) 'face 'mode-line-emphasis)))))
 
 (defun gptel--rewrite-move (search-func)
   "Move directionally to a gptel rewrite location using SEARCH-FUNC."
@@ -334,21 +334,21 @@ BUF is the buffer to modify, defaults to the overlay buffer."
   (interactive
    (list
     (if-let* ((ov (cdr-safe (get-char-property-and-overlay (point) 'gptel-rewrite))))
-      (unwind-protect
-          (pcase-let ((choices '((?a "accept") (?k "reject") (?r "iterate")
-                                 (?m "merge") (?d "diff") (?e "ediff")))
-                      (hint-str (concat "[" (gptel--model-name gptel-model) "]\n")))
-            (overlay-put
-             ov 'before-string
-             (concat
-              (unless (eq (char-before (overlay-start ov)) ?\n) "\n")
-              (propertize "REWRITE READY: " 'face 'success)
-              (mapconcat (lambda (e) (cdr e)) (mapcar #'rmc--add-key-description choices) ", ")
-              (propertize
-               " " 'display `(space :align-to (- right ,(1+ (length hint-str)))))
-              (propertize hint-str 'face 'success)))
-            (read-multiple-choice "Action: " choices))
-        (overlay-put ov 'before-string nil))
+        (unwind-protect
+            (pcase-let ((choices '((?a "accept") (?k "reject") (?r "iterate")
+                                   (?m "merge") (?d "diff") (?e "ediff")))
+                        (hint-str (concat "[" (gptel--model-name gptel-model) "]\n")))
+              (overlay-put
+               ov 'before-string
+               (concat
+                (unless (eq (char-before (overlay-start ov)) ?\n) "\n")
+                (propertize "REWRITE READY: " 'face 'success)
+                (mapconcat (lambda (e) (cdr e)) (mapcar #'rmc--add-key-description choices) ", ")
+                (propertize
+                 " " 'display `(space :align-to (- right ,(1+ (length hint-str)))))
+                (propertize hint-str 'face 'success)))
+              (read-multiple-choice "Action: " choices))
+          (overlay-put ov 'before-string nil))
       (user-error "No gptel rewrite at point!"))))
   (call-interactively
    (intern (concat "gptel--rewrite-" (cadr choice)))))
@@ -440,15 +440,15 @@ By default, gptel uses the directive associated with the `rewrite'
  key in `gptel-directives'.  You can add more rewrite-specific
  directives to `gptel-directives' and pick one from here."
   [:description gptel-system-prompt--format
-   [(gptel--suffix-rewrite-directive)]
-   [(gptel--infix-variable-scope)]]
-   [:class transient-column
-    :setup-children
-    (lambda (_) (transient-parse-suffixes
-            'gptel--rewrite-directive-menu
-            (gptel--setup-directive-menu
-             'gptel--rewrite-directive "Rewrite directive")))
-    :pad-keys t])
+                [(gptel--suffix-rewrite-directive)]
+                [(gptel--infix-variable-scope)]]
+  [:class transient-column
+   :setup-children
+   (lambda (_) (transient-parse-suffixes
+                'gptel--rewrite-directive-menu
+                (gptel--setup-directive-menu
+                 'gptel--rewrite-directive "Rewrite directive")))
+   :pad-keys t])
 
 (define-obsolete-function-alias 'gptel-rewrite-menu 'gptel-rewrite "0.9.6")
 
@@ -486,12 +486,12 @@ By default, gptel uses the directive associated with the `rewrite'
     (gptel--suffix-rewrite-ediff)]]
   [[:description "Rewrite"
     :if (lambda () (or (get-char-property (point) 'gptel-rewrite)
-                  (use-region-p)))
+                       (use-region-p)))
     (gptel--suffix-rewrite)]
    ["Dry Run"
     :if (lambda () (and (or gptel-log-level gptel-expert-commands)
-                   (or (get-char-property (point) 'gptel-rewrite)
-                       (use-region-p))))
+                        (or (get-char-property (point) 'gptel-rewrite)
+                            (use-region-p))))
     ("I" "Inspect query (Lisp)"
      (lambda ()
        "Inspect the query that will be sent as a lisp object."
@@ -640,6 +640,14 @@ generated from functions."
   :description "Clear pending rewrites"
   (interactive)
   (gptel--rewrite-reject gptel--rewrite-overlays))
+
+(defun gptel--remove-all-context ()
+  "Remove all context overlays and reset any associated variables."
+  (interactive)
+  (dolist (ov gptel--rewrite-overlays)
+    (delete-overlay ov))
+  (setq gptel--rewrite-overlays nil)
+  (message "All context removed."))
 
 (provide 'gptel-rewrite)
 ;;; gptel-rewrite.el ends here
